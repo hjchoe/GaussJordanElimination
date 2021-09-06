@@ -31,7 +31,7 @@ class MatrixOperations
 		
 		for (int i = 0; i < m.length; i++)
 		{
-			for (int j = 0; j < m[0].length-1; j++)
+			for (int j = 0; j < m.length; j++)
 			{
 				result[i][j] = m[i][j];
 				result[i][j+m.length] = identity[i][j];
@@ -68,14 +68,15 @@ class MatrixOperations
 		return null;
 	}
 	
-	void swapRows(double[][] m, int r1, int r2)
+	double[][] swapRows(double[][] m, int r1, int r2)
 	{
-		double[][] temp = copyArray(m);
+		double[][] result = copyArray(m);
 		for (int i = 0; i < m[0].length; i++)
 		{
-			m[r2][i] = temp[r1][i];
-			m[r1][i] = temp[r2][i];
+			result[r2][i] = m[r1][i];
+			result[r1][i] = m[r2][i];
 		}
+		return result;
 	}
 	
 	double[][] copyArray(double[][] m)
@@ -91,19 +92,50 @@ class MatrixOperations
 		return newArray;
 	}
 	
-	int inputMatrixSize()
+	Coord inputMatrixSize()
 	{
-		int size = 0;
-		System.out.println("Enter matrix size (ex: enter 3 for 3x3 matrix): ");
-		System.out.flush(); 
-	    try
-	    {
-			size = Integer.parseInt(stdin.readLine());
+		Coord size;
+		StringBuffer r = new StringBuffer();
+		StringBuffer c = new StringBuffer();
+		int rowSize = 0;
+		int columnSize = 0;
+		int index = 0;
+		String input;
+		
+		System.out.println("Enter matrix size (ex: enter 3x4 for 3x4 matrix): ");
+		System.out.flush();
+		
+		try
+		{
+			input = stdin.readLine();
+			
+			for (int i = index; i < input.length(); i++)
+			{
+				String substr = input.substring(i, i+1);
+				if (!substr.equalsIgnoreCase("x"))
+				{
+					r.append(substr);
+				}
+				else
+				{
+					index = i;
+					break;
+				}
+			}
+			for (int i = index+1; i < input.length(); i++)
+			{
+				String substr = input.substring(i, i+1);
+				c.append(substr);
+			}
+			
+			rowSize = Integer.parseInt(r.toString());
+			columnSize = Integer.parseInt(c.toString());
 		} catch (NumberFormatException | IOException e)
-	    {
+		{
 			e.printStackTrace();
 			System.exit(0);
 		}
+	    size = new Coord(rowSize, columnSize);
 	    return size;
 	}
 	

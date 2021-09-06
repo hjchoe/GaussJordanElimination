@@ -19,24 +19,27 @@ class EchelonOperations
 		{
 	        if (pivot.c >= cL) return result;
 	        
-			pivot = mo.findPivot(result, row, pivot.c, rL, cL);
+	        // find pivot point
+			pivot = mo.findPivot(result, row, 0, rL, cL);
+			
+			// if there is no pivot, return matrix
 			if (pivot == null) return result;
 			
-			mo.swapRows(result, row, pivot.r);
+			// swap row if pivot is not on same row
+			result = mo.swapRows(result, row, pivot.r);
 			
+			// rest of the rows below
 			for (int i = pivot.r+1; i < rL; i++)
 			{
 				double f = result[i][pivot.c] / result[row][pivot.c];
 				
-				result[i][pivot.r] = 0;
+				result[i][pivot.c] = 0;
 				
 				for (int j = pivot.c+1; j < tcL; j++)
 				{
 					result[i][j] = (result[i][j] - result[pivot.r][j] * f);
 				}
 			}
-			pivot.r++;
-			pivot.c++;
 		}
 		return result;
 	}
@@ -46,11 +49,12 @@ class EchelonOperations
 		double[][] result = mo.copyArray(m);
 		
 		Coord pivot = new Coord(0, 0);
+		Coord belowPivot = new Coord(0, 0);
 		result = ref(result, rL, cL, tcL);
 		
 		for (int row = 0; row < rL; row++)
 		{
-			pivot = mo.findPivot(result, pivot.r, pivot.c, rL, cL);
+			pivot = mo.findPivot(result, row, 0, rL, cL);
 			if (pivot == null) return result;
 			
 			if (result[pivot.r][pivot.c] != 1)
@@ -61,24 +65,39 @@ class EchelonOperations
 					result[pivot.r][col] = result[pivot.r][col] / mul;
 				}
 			}
-			pivot.r++;
-			pivot.c++;
 		}
 		
+
 		for (int row = 0; row < rL; row++)
 		{
-			for (int col = row+1; col < cL-1; col++)
+			pivot = mo.findPivot(result, row, 0, rL, cL);
+			if (pivot == null) return result;
+			
+			for (int col = pivot.c+1; col < cL; col++)
 			{
 				if (result[row][col] != 0)
 				{
 					double mul = result[row][col];
-					for (int i = 0; i < tcL; i++)
+					
+					for (int r = row+1; r < rL; r++)
 					{
-						result[row][i] = result[row][i] - (result[col][i] * mul);
+						if (result[r][col] != 0d)
+						{
+							belowPivot = new Coord(r, col);
+						}
+					}
+					
+					for (int i = col; i < tcL; i++)
+					{
+						if (belowPivot != null)
+						{
+							result[row][i] = result[row][i] - (result[belowPivot.r][i] * mul);
+						}
 					}
 				}
 			}
 		}
+		
 		return result;
 	}
 	
